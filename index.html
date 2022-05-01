@@ -4,33 +4,56 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
+  
   <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
   <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+  
   <title>replit</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
-</head>
+  <style>
+    .screens {
+      display: none;
+    }
 
+    #map {
+      height: 100%;
+      width: 100%;
+      position: static;
+    }
+      /* Optional: Makes the sample page fill the window. */
+/*       html,*/
+    body {
+/*       height: 100%; */
+      margin: 0;
+/*       padding: 0; */
+    } 
+  </style>
+</head>
 
 <body>
   <aside class="mdc-drawer mdc-drawer--dismissible">
     <div class="mdc-drawer__content">
       <div class="mdc-list">
         <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page">
+<!--           <a class="mdc-list-item" href="#"> -->
           <span class="mdc-list-item__ripple"></span>
-          <!--<i class="material-icons mdc-list-item__graphic" aria-hidden="true">inbox</i>-->
-          <span class="mdc-list-item__text">Mercury Retrogade</span>
+          <span id="home" class="mdc-list-item__text">Home</span>
         </a>
         <a class="mdc-list-item" href="#">
           <span class="mdc-list-item__ripple"></span>
-          <!--<i class="material-icons mdc-list-item__graphic" aria-hidden="true">send</i>-->
-          <span class="mdc-list-item__text">Cat Facts</span>
+          <span id="mercury" class="mdc-list-item__text">Mercury Retrogade</span>
         </a>
         <a class="mdc-list-item" href="#">
           <span class="mdc-list-item__ripple"></span>
-          <!--<i class="material-icons mdc-list-item__graphic" aria-hidden="true">drafts</i>-->
-          <span class="mdc-list-item__text">Data</span>
+          <span id="cats" class="mdc-list-item__text">Cat Facts</span>
+        </a>
+        <a class="mdc-list-item" href="#">
+<!--         <a class="mdc-list-item mdc-list-item--activated" href="#" aria-current="page"> -->
+          <span class="mdc-list-item__ripple"></span>
+          <span id="data" class="mdc-list-item__text">Data</span>
         </a>
       </div>
     </div>
@@ -47,20 +70,181 @@
     </header>
 
     <main class="main-content" id="main-content">
-      <div class="mdc-top-app-bar--fixed-adjust">
-        App Content
-      </div>
+      <div class="mdc-top-app-bar--fixed-adjust"></div>
+      <section class="screens home">
+        <h1>Hi there!</h1>
+      </section>
+      <section class="screens mercury">
+        <p>Was Mercury in Retrograde on Sept. 14, 2016?</p>
+        <p id="answer"></p>
+        <script>
+          let url1 = "https://mercuryretrogradeapi.com?date=2016-09-14";
+        
+        fetch (url1)
+          .then ( (response) => {
+            return response.json();
+          })
+          .then ( (json) => {
+            document.getElementById("answer").innerHTML = JSON.stringify(json);
+          })
+        </script>
+      </section>
+      <section class="screens cats">
+        <p>Random Cat Fact: (Reload page for new cat fact)</p>
+        <p id="response"></p>
+        <script>
+          let url2 = "https://meowfacts.herokuapp.com";
+
+        fetch (url2)
+          .then ( (response) => {
+            return response.json();
+          })
+          .then ( (json) => {
+            document.getElementById("response").innerHTML = JSON.stringify(json);
+          })
+        </script>
+      </section>
+      <section class="screens data">
+        <h1>Your Location:</h1>
+        <div id="map" style="position: absolute;"></div>
+          <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtFUQRC47gllgyG0hkq4TxJ1dVJ--450g&callback=initMap"></script>
+        <script>
+          let map;
+        function initMap() {
+          map = new google.maps.Map(document.getElementById("map"), {
+          // UIC Center
+          center: { lat: 41.8696, lng: -87.6496 },
+          zoom: 15,
+          });
+          
+          navigator.geolocation.getCurrentPosition((location) => {
+            let gLat = location.coords.latitude;
+            let gLng = location.coords.longitude;
+  
+            map.setCenter({ lat: gLat, lng: gLng });
+            
+            new google.maps.Marker({
+            position: { lat: gLat, lng: gLng },
+            map,
+            title: "Here",
+            });
+          });
+        }
+        </script>
+      </section>
     </main>
   </div>
-</body>
 
-  <script>
+<script>
     const drawerEl = document.querySelector('.mdc-drawer');
     const drawer = new mdc.drawer.MDCDrawer.attachTo(drawerEl);
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-topAppBar.setScrollTarget(document.getElementById('main-content'));
-topAppBar.listen('MDCTopAppBar:nav', () => {
-  drawer.open = !drawer.open;
-});
+    
+    topAppBar.setScrollTarget(document.getElementById('main-content'));
+    topAppBar.listen('MDCTopAppBar:nav', () => {
+      drawer.open = !drawer.open;
+    });
+
+    let mCheck = true;
+    let cCheck = true;
+    let gCheck = true;
+    
+    let selected = document.querySelector(".mdc-list-item--activated");
+    let current = selected.querySelector(".mdc-list-item__text").id;
+    document.querySelector("." + current).style.display = "block";
+
+    drawerEl.addEventListener("click", (e) => {
+      selected = document.querySelector(".mdc-list-item--activated");
+      let newCurrent = selected.querySelector(".mdc-list-item__text").id;
+      if (current != selected) {
+        document.querySelector("." + newCurrent).style.display = "block";
+        document.querySelector("." + current).style.display = "none";
+      }
+      current = newCurrent;
+    })
+    
   </script>
+  
+</body>
+<!-- Before  <script>
+    const drawerEl = document.querySelector('.mdc-drawer');
+    const drawer = new mdc.drawer.MDCDrawer.attachTo(drawerEl);
+    const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
+    
+    topAppBar.setScrollTarget(document.getElementById('main-content'));
+    topAppBar.listen('MDCTopAppBar:nav', () => {
+      drawer.open = !drawer.open;
+    });
+
+    let mCheck = true;
+    let cCheck = true;
+    let gCheck = true;
+    
+    let selected = document.querySelector(".mdc-list-item--activated");
+    let current = selected.querySelector(".mdc-list-item__text").id;
+    document.querySelector("." + current).style.display = "block";
+
+    drawerEl.addEventListener("click", (e) => {
+      selected = document.querySelector(".mdc-list-item--activated");
+      let newCurrent = selected.querySelector(".mdc-list-item__text").id;
+      if (current != selected) {
+        document.querySelector("." + newCurrent).style.display = "block";
+        document.querySelector("." + current).style.display = "none";
+      }
+      current = newCurrent;
+
+      if (current == "mercury") {
+        let url = "https://mercuryretrogradeapi.com?date=2016-09-14";
+        
+        fetch (url)
+          .then ( (response) => {
+            return response.json();
+          })
+          .then ( (json) => {
+            // console.log(json);
+            document.getElementById("answer").innerHTML = JSON.stringify(json);
+            
+            
+          })
+      }
+      else if (current == "cats") {
+        let url = "https://meowfacts.herokuapp.com";
+
+        fetch (url)
+          .then ( (response) => {
+            return response.json();
+          })
+          .then ( (json) => {
+            // console.log(json);
+            document.getElementById("response").innerHTML = JSON.stringify(json);
+            
+            
+          })
+      }
+      else if (current == "data ") {
+        let map;
+        function initMap() {
+          map = new google.maps.Map(document.getElementById("map"), {
+          // UIC Center
+          center: { lat: 41.8696, lng: -87.6496 },
+          zoom: 15,
+          });
+          
+          navigator.geolocation.getCurrentPosition((location) => {
+            let gLat = location.coords.latitude;
+            let gLng = location.coords.longitude;
+  
+            map.setCenter({ lat: gLat, lng: gLng });
+            
+            new google.maps.Marker({
+            position: { lat: gLat, lng: gLng },
+            map,
+            title: "Here",
+            });
+          });
+        }
+      }
+    })
+    
+  </script> -->
 </html>
