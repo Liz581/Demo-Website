@@ -82,18 +82,35 @@
         <h1>Hi there!</h1>
       </section>
       <section class="screens mercury">
-        <p>Was Mercury in Retrograde on Sept. 14, 2016?</p>
+        <p>Was Mercury in Retrograde?</p>
+        <form method="POST">
+          <label for="department">Enter date in given format: (YYYY-MM-DD)</label><br>
+          <input type="text" id="department" name="department"><br>
+          <input type="button" id="getData" value="Get Data"></input>
+          <div id="Results"></div>
+        </form>
         <p id="answer"></p>
-        <script>
-          let url1 = "https://mercuryretrogradeapi.com?date=2016-09-14";
         
-        fetch (url1)
-          .then ( (response) => {
-            return response.json();
-          })
-          .then ( (json) => {
-            document.getElementById("answer").innerHTML = JSON.stringify(json);
-          })
+        <script>
+          // let url1 = "https://mercuryretrogradeapi.com?date=2016-09-14";
+          let url1 = "https://mercuryretrogradeapi.com?date=";
+
+          document.querySelector("#getData")
+            .addEventListener ( "click", (evt) => {
+    
+              // get input value
+              let date = document.querySelector("#department").value;
+    
+              fetch(url1 + date)
+                .then ( (response) => {
+                  return response.json()
+                })
+                .then ( (json) => {
+                  console.log(json)
+                  document.getElementById("answer").innerHTML = JSON.stringify(json);
+                })
+            });
+          
         </script>
       </section>
       <section class="screens cats">
@@ -142,7 +159,7 @@
     </main>
   </div>
 
-<script>
+  <script>
     const drawerEl = document.querySelector('.mdc-drawer');
     const drawer = new mdc.drawer.MDCDrawer.attachTo(drawerEl);
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
@@ -169,89 +186,6 @@
       }
       current = newCurrent;
     })
-    
   </script>
-  
 </body>
-<!-- Before  <script>
-    const drawerEl = document.querySelector('.mdc-drawer');
-    const drawer = new mdc.drawer.MDCDrawer.attachTo(drawerEl);
-    const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-    
-    topAppBar.setScrollTarget(document.getElementById('main-content'));
-    topAppBar.listen('MDCTopAppBar:nav', () => {
-      drawer.open = !drawer.open;
-    });
-
-    let mCheck = true;
-    let cCheck = true;
-    let gCheck = true;
-    
-    let selected = document.querySelector(".mdc-list-item--activated");
-    let current = selected.querySelector(".mdc-list-item__text").id;
-    document.querySelector("." + current).style.display = "block";
-
-    drawerEl.addEventListener("click", (e) => {
-      selected = document.querySelector(".mdc-list-item--activated");
-      let newCurrent = selected.querySelector(".mdc-list-item__text").id;
-      if (current != selected) {
-        document.querySelector("." + newCurrent).style.display = "block";
-        document.querySelector("." + current).style.display = "none";
-      }
-      current = newCurrent;
-
-      if (current == "mercury") {
-        let url = "https://mercuryretrogradeapi.com?date=2016-09-14";
-        
-        fetch (url)
-          .then ( (response) => {
-            return response.json();
-          })
-          .then ( (json) => {
-            // console.log(json);
-            document.getElementById("answer").innerHTML = JSON.stringify(json);
-            
-            
-          })
-      }
-      else if (current == "cats") {
-        let url = "https://meowfacts.herokuapp.com";
-
-        fetch (url)
-          .then ( (response) => {
-            return response.json();
-          })
-          .then ( (json) => {
-            // console.log(json);
-            document.getElementById("response").innerHTML = JSON.stringify(json);
-            
-            
-          })
-      }
-      else if (current == "data ") {
-        let map;
-        function initMap() {
-          map = new google.maps.Map(document.getElementById("map"), {
-          // UIC Center
-          center: { lat: 41.8696, lng: -87.6496 },
-          zoom: 15,
-          });
-          
-          navigator.geolocation.getCurrentPosition((location) => {
-            let gLat = location.coords.latitude;
-            let gLng = location.coords.longitude;
-  
-            map.setCenter({ lat: gLat, lng: gLng });
-            
-            new google.maps.Marker({
-            position: { lat: gLat, lng: gLng },
-            map,
-            title: "Here",
-            });
-          });
-        }
-      }
-    })
-    
-  </script> -->
 </html>
